@@ -1,0 +1,3 @@
+# ignore temp files (i.e. used for testing) - standard and windows formats
+*/temp.*
+*\temp.*
