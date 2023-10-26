@@ -2,11 +2,7 @@
 Add tf-idf labels to dataset.
 TODO: SET UP MANUAL TF-IDF
 """
-import argparse
-import numpy as np
-import time
 from sklearn.feature_extraction.text import TfidfVectorizer
-from tqdm import tqdm
 
 from constants import *
 tqdm.pandas()
