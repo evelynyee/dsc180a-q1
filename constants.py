@@ -11,6 +11,8 @@ TWENTY_NEWS = '20news'
 
 CONWEA_DATA_PATH = os.path.abspath(os.path.join('..','ConWea','data'))
 DATA_PATH = 'data'
+MODELS_PATH = 'models'
+RESULTS_FILE = 'f1_scores.txt'
 
 def get_data_path(set, granularity='coarse', type='data', local=True):
     """Retrieve path to data file."""

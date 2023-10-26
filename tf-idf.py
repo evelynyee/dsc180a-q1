@@ -4,6 +4,7 @@ TODO: SET UP MANUAL TF-IDF
 """
 import argparse
 import numpy as np
+import time
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm import tqdm
 
@@ -44,6 +45,7 @@ args = parser.parse_args()
 set = eval(args.set)
 gran = args.gran
 
+print('Loading dataset.')
 df_path = get_data_path(set, granularity=gran)
 df = get_data(set, granularity=gran)
 seeds = get_data(set, granularity=gran, type='seedwords')
@@ -56,3 +58,8 @@ print("Identifying best labels")
 df['tfidf-auto'] = df.index.to_series().progress_apply(get_label)
 with open(df_path, 'wb') as f:
     pickle.dump(df, f)
+
+macro_f1, micro_f1 = f1_scores(df,'tfidf-auto')
+with open(RESULTS_FILE, 'a') as f:
+    f.write(f'{set}-{gran}: TF-IDF finished running at {time.ctime()}. Macro F1: {macro_f1}; Micro F1: {micro_f1}\n')
+print('F1 scores saved at {RESULTS_FILE}')
