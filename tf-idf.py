@@ -37,9 +37,25 @@ parser.add_argument("--set", type=str, required=True,
                     help="Which dataset to use.")
 parser.add_argument("--gran", type=str, default='coarse',
                     help="Which dataset granularity to use.")
+parser.add_argument("--hyper", nargs='*',
+                    help="Hyperparameters for the Word2Vec model. \
+Arguments should all be specified like `argname=value`.\
+See https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html\
+for a list of possible hyperparameters.")
+
 args = parser.parse_args()
 set = eval(args.set)
 gran = args.gran
+hyper = {}
+if args.hyper:
+    for kwarg in args.hyper: # These are optional
+        argname,value = kwarg.split("=") # parse the argument names and values from the command-line strings
+        hyper[argname] = value
+if hyper:
+    style = format_hyperparams(hyper)
+else:
+    style = 'auto'
+style = 'tfidf '+style
 
 print('Loading dataset.')
 df_path = get_data_path(set, granularity=gran)
@@ -47,15 +63,17 @@ df = get_data(set, granularity=gran)
 seeds = get_data(set, granularity=gran, type='seedwords')
 
 print('Getting TF-IDF encodings.')
-tfidf = TfidfVectorizer()
+tfidf = TfidfVectorizer(**hyper)
 vecs = tfidf.fit_transform(tqdm(df['sentence']))
 
-print("Identifying best labels")
-df['tfidf-auto'] = df.index.to_series().progress_apply(get_label)
+print("Identifying best labels.")
+df[style] = df.index.to_series().progress_apply(get_label)
 with open(df_path, 'wb') as f:
     pickle.dump(df, f)
 
-macro_f1, micro_f1 = f1_scores(df,'tfidf-auto')
+macro_f1, micro_f1 = f1_scores(df,style)
+results = f'{set}-{gran}: TF-IDF finished running at {time.ctime()}. Macro F1: {macro_f1}; Micro F1: {micro_f1}'
 with open(RESULTS_FILE, 'a') as f:
-    f.write(f'{set}-{gran}: TF-IDF finished running at {time.ctime()}. Macro F1: {macro_f1}; Micro F1: {micro_f1}\n')
-print('F1 scores saved at {RESULTS_FILE}')
+    f.write(results)
+    f.write('\n')
+print(f'F1 scores saved at {RESULTS_FILE}')

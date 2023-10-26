@@ -58,6 +58,16 @@ def get_data(set, granularity='coarse', type='data'):
                 pickle.dump(data,f)
     return data
 
+def format_hyperparams(prefix='',suffix='',**kwargs):
+    """Format a dictionary into a string. (i.e. for file naming)"""
+    formatted = prefix
+    if kwargs:
+        formatted += '_'
+        formatted += '_'.join(map(lambda i: f'{i[0]}-{i[1]}', kwargs.items()))
+    if suffix:
+        formatted += suffix
+    return formatted
+
 def f1_scores(df,y_pred, y_true='label'):
     """Calculate macro and micro F1 scores."""
     return (f1_score(df[y_true],df[y_pred],average='macro'),
