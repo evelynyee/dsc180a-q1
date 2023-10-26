@@ -4,6 +4,7 @@ Constants for the DSC 180A Quarter 1 project.
 import os
 import pickle
 import json
+from sklearn.metrics import f1_score
 
 NYT = 'nyt'
 TWENTY_NEWS = '20news'
@@ -50,3 +51,8 @@ def get_data(set, granularity='coarse', type='data'):
             with open(save_results, 'wb') as f:
                 pickle.dump(data,f)
     return data
+
+def f1_scores(df,y_pred, y_true='label'):
+    """Calculate macro and micro F1 scores."""
+    return (f1_score(df[y_true],df[y_pred],average='macro'),
+            f1_score(df[y_true],df[y_pred],average='micro'))
