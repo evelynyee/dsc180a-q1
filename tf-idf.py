@@ -73,6 +73,7 @@ with open(df_path, 'wb') as f:
 
 macro_f1, micro_f1 = f1_scores(df,style)
 results = f'{set}-{gran}: TF-IDF finished running at {time.ctime()}. Macro F1: {macro_f1}; Micro F1: {micro_f1}'
+print(results)
 with open(RESULTS_FILE, 'a') as f:
     f.write(results)
     f.write('\n')
