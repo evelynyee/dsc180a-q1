@@ -5,6 +5,7 @@ TODO: SET UP MANUAL WORD2VEC
 from gensim.models import Word2Vec, KeyedVectors
 from gensim.models.callbacks import CallbackAny2Vec
 from gensim.utils import tokenize
+from scipy.spatial.distance import cosine
 
 from constants import *
 tqdm.pandas()
@@ -43,9 +44,31 @@ def get_embeddings (set,gran='coarse', tokenizer=tokenize, hyperparams={}):
     print(f'Retrieving Word2Vec embeddings from {save_path}')
     return KeyedVectors.load_word2vec_format(save_path), style
 
-def get_label ():
-    assert False, "get_label function not implemented yet."
-    # TODO
+def aggregate_embeddings (doc:[str,list],tokenizer,embeds, agg=lambda x:np.mean(x,axis=0)):
+    # if not isinstance (doc, str): # re-tokenize document to be compatible with the embeddings
+    #     doc = ' '.join(doc)
+    # words = tokenizer(doc)
+    if isinstance(doc, str):
+        words = tokenizer(doc)
+    else:
+        words = doc
+    word_embeds = []
+    for word in words:
+        if word in embeds:
+            word_embeds.append(embeds[word])
+    return agg(word_embeds)
+
+def get_label (doc_embed, label_embeds, similarity):
+    """
+    Get the ideal label for a document (specified by its embedding), using cosine similarity to the seedword embeddings.
+    """
+    scores = []
+    for label, embed in label_embeds.items():
+        scores.append((similarity(doc_embed, embed), label))
+    return max(scores)[1]
+
+def cosine_sim (u,v):
+    return 1-cosine(u,v)
 
 # Set up command-line arguments parser
 parser = argparse.ArgumentParser()
@@ -57,6 +80,8 @@ parser.add_argument("--gran", type=str, default='coarse',
                     help="Which dataset granularity to use.")
 parser.add_argument("--token", type=str, default='tokenize',
                     help="Tokenizer to use. Default is 'tokenize' from gensim.")
+parser.add_argument("--sim", type=str, default='cosine_sim',
+                    help="Which similarity function to use. Default is cosine similarity.")
 parser.add_argument("--hyper", nargs='*',
                     help="Hyperparameters for the Word2Vec model. \
 Arguments should all be specified like `argname=value`.\
@@ -68,6 +93,7 @@ args = parser.parse_args()
 set = eval(args.set)
 gran = args.gran
 tokenizer = eval(args.token)
+sim = eval(args.sim)
 hyper = {}
 if args.hyper:
     for kwarg in args.hyper: # These are optional
@@ -75,26 +101,33 @@ if args.hyper:
         hyper[argname] = value
 
 
+
 print('Loading dataset.')
 df_path = get_data_path(set, granularity=gran)
 df = get_data(set, granularity=gran)
 seeds = get_data(set, granularity=gran, type='seedwords')
 
+print('Getting word embeddings')
 embeds,style = get_embeddings(set,gran=gran,tokenizer=tokenizer,hyperparams=hyper)
 if not style:
     style = 'auto'
 style = 'w2v '+style
+print(embeds)
 
-print('Getting class embeddings')
-# TODO
+print('Aggregating class embeddings')
+class_embeds = {label:aggregate_embeddings(seedwords,tokenizer,embeds) for label,seedwords in tqdm(seeds.items())}
+
+print("Aggregating document embeddings")
+doc_embeddings = df['sentence'].progress_apply(lambda doc: aggregate_embeddings(doc,tokenizer,embeds))
 
 print("Identifying best labels")
-df[style] = df.index.to_series().progress_apply(get_label)
+df[style] = doc_embeddings.progress_apply(lambda doc: get_label(doc,class_embeds, sim))
 with open(df_path, 'wb') as f:
     pickle.dump(df, f)
 
 macro_f1, micro_f1 = f1_scores(df,style)
 results = f'{set}-{gran}: TF-IDF finished running at {time.ctime()}. Macro F1: {macro_f1}; Micro F1: {micro_f1}'
+print(results)
 with open(RESULTS_FILE, 'a') as f:
     f.write(results)
     f.write('\n')

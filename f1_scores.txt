@@ -2,3 +2,4 @@ nyt-coarse: TF-IDF finished running at Thu Oct 26 16:47:54 2023. Macro F1: 0.607
 20news-coarse: TF-IDF finished running at Thu Oct 26 16:48:39 2023. Macro F1: 0.541902639853868; Micro F1: 0.4976723807437428
 20news-fine: TF-IDF finished running at Fri Oct 27 11:50:20 2023. Macro F1: 0.5410649516043248; Micro F1: 0.48754039104003505
 nyt-fine: TF-IDF finished running at Fri Oct 27 11:52:01 2023. Macro F1: 0.5862589439194785; Micro F1: 0.5250281946733756
+nyt-coarse: TF-IDF finished running at Mon Dec  4 09:58:08 2023. Macro F1: 0.4180758188523866; Micro F1: 0.8348225904398368
