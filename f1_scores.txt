@@ -1,8 +1,0 @@
-nyt-coarse(original) (hyperparameters: {'epochs': 40, 'window': 20, 'workers': 4}): Word2Vec finished running at Mon Dec  4 18:06:36 2023. Macro F1: 0.739669222235134; Micro F1: 0.9235707469419624
-20news-coarse(original) (hyperparameters: {'epochs': 40, 'window': 20, 'workers': 4}): Word2Vec finished running at Mon Dec  4 18:10:57 2023. Macro F1: 0.5893556257418584; Micro F1: 0.6468043156799387
-nyt-fine(original) (hyperparameters: {'epochs': 40, 'window': 20, 'workers': 4}): Word2Vec finished running at Mon Dec  4 18:25:06 2023. Macro F1: 0.7085117097776314; Micro F1: 0.7949162835082849
-20news-fine(original) (hyperparameters: {'epochs': 40, 'window': 20, 'workers': 4}): Word2Vec finished running at Mon Dec  4 18:38:42 2023. Macro F1: 0.5506788317299216; Micro F1: 0.5664603757051317
-nyt-coarse: TF-IDF finished running at Mon Dec  4 20:31:36 2023. Macro F1: 0.607252385118526; Micro F1: 0.8480090222954801
-nyt-fine: TF-IDF finished running at Mon Dec  4 20:32:42 2023. Macro F1: 0.5862589439194785; Micro F1: 0.5250281946733756
-20news-coarse: TF-IDF finished running at Mon Dec  4 20:33:37 2023. Macro F1: 0.541902639853868; Micro F1: 0.4976723807437428
-20news-fine: TF-IDF finished running at Mon Dec  4 20:35:40 2023. Macro F1: 0.5410649516043248; Micro F1: 0.48754039104003505
